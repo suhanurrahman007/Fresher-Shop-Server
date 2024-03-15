@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const uri = `mongodb+srv://${process.env.FT_DB_USER}:${process.env.FT_DB_PASS}@cluster0.33tct4k.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.FT_DB_USER}:${process.env.FT_DB_PASS}@cluster0.33tct4k.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -23,6 +23,26 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const productsCollection = client.db("superShop").collection("products");
+
+    app.get("/products", async (req, res) => {
+      const page = Number(req.query.page);
+      const size = Number(req.query.size);
+
+      const options = {
+        sort: {
+          time: -1,
+        },
+      };
+      const result = await productsCollection
+        .find({}, options)
+        .skip(page * size)
+        .limit(size)
+        .toArray();
+      res.send(result);
+    });
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({
