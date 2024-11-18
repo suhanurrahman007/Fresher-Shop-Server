@@ -4,7 +4,7 @@ require("dotenv").config();
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 const app = express();
-
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 app.use(cors());
 app.use(express.json());
 
@@ -28,6 +28,7 @@ async function run() {
     const postsCollection = client.db("superShop").collection("posts");
     const commentsCollection = client.db("superShop").collection("comments");
     const paymentCollection = client.db("superShop").collection("payment");
+    const orderCollection = client.db("superShop").collection("order");
     // ============================== ADMIN =================================
 
     // Admin
@@ -237,6 +238,81 @@ async function run() {
         _id: new ObjectId(id),
       };
       const result = await commentsCollection.findOne(query);
+      res.send(result);
+    });
+
+    // =========================== Order PARCEL ===================================
+
+    //order collection updated
+    app.get("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await orderCollection.findOne(query);
+      res.send(result);
+    });
+
+    // Order collection
+    app.get("/order", async (req, res) => {
+      const user = req.query.email;
+      const query = {};
+      if (user) {
+        query.email = user;
+      }
+
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.post("/order", async (req, res) => {
+      const order = req.body;
+      order.time = new Date();
+      const result = await orderCollection.insertOne(order);
+      res.send(result);
+    });
+
+    // Order update
+    app.put("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateOrder = req.body;
+      // console.log(updateOrder);
+
+      const filter = { _id: new ObjectId(id) };
+      const orderUpdate = {
+        $set: {
+          // phone: updateOrder?.phone,
+          // deliveryDate: updateOrder?.time,
+          payment: updateOrder?.payment,
+        },
+      };
+
+      const result = await orderCollection.updateOne(filter, orderUpdate);
+      res.send(result);
+    });
+
+    app.patch("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body;
+
+      const filter = {
+        _id: new ObjectId(id),
+      };
+
+      const statusUpdate = {
+        $set: {
+          status: status?.status,
+          payment: status?.payment,
+        },
+      };
+
+      const result = await orderCollection.updateOne(filter, statusUpdate);
+      res.send(result);
+    });
+
+    // Delete order
+    app.delete("/order/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
       res.send(result);
     });
 
