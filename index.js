@@ -27,6 +27,7 @@ async function run() {
     const productsCollection = client.db("superShop").collection("products");
     const postsCollection = client.db("superShop").collection("posts");
     const commentsCollection = client.db("superShop").collection("comments");
+    const brandsCollection = client.db("superShop").collection("brand");
     const paymentCollection = client.db("superShop").collection("payment");
     const orderCollection = client.db("superShop").collection("order");
     // ============================== ADMIN =================================
@@ -116,6 +117,7 @@ async function run() {
           time: -1,
         },
       };
+
       const result = await productsCollection
         .find({}, options)
         .skip(page * size)
@@ -240,6 +242,33 @@ async function run() {
       const result = await commentsCollection.findOne(query);
       res.send(result);
     });
+
+
+     // =========================== brands ==============================
+
+    // post method for posts
+    app.post("/brands", async (req, res) => {
+      const brands = req.body;
+      brands.time = new Date();
+      const result = await brandsCollection.insertOne(brands);
+      res.send(result);
+    });
+
+    // get method for posts
+    app.get("/brands", async (req, res) => {
+      const result = await brandsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/brands/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await brandsCollection.findOne(query);
+      res.send(result);
+    });
+    
 
     // =========================== Order PARCEL ===================================
 
