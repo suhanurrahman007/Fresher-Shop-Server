@@ -244,7 +244,34 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/comments/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await commentsCollection.deleteOne(query);
+      res.send(result);
+    });
 
+    app.put("/comments/:id", async (req, res) => {
+      const id = req.params.id;
+      const { updatedLike } = req.body; // Destructure the correct field from the body
+    
+      const filter = { _id: new ObjectId(id) };
+      const likeUpdate = {
+        $set: {
+          like: updatedLike, // Correctly use the updated like count
+        },
+      };
+    
+      try {
+        const result = await commentsCollection.updateOne(filter, likeUpdate);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating like:", error);
+        res.status(500).send({ error: "Failed to update like" });
+      }
+    });
+    
+    
      // =========================== brands ==============================
 
     // post method for posts
