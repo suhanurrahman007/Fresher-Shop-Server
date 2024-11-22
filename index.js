@@ -27,6 +27,7 @@ async function run() {
     const productsCollection = client.db("superShop").collection("products");
     const postsCollection = client.db("superShop").collection("posts");
     const commentsCollection = client.db("superShop").collection("comments");
+    const cartsCollection = client.db("superShop").collection("carts");
     const brandsCollection = client.db("superShop").collection("brand");
     const paymentCollection = client.db("superShop").collection("payment");
     const orderCollection = client.db("superShop").collection("order");
@@ -269,6 +270,38 @@ async function run() {
       res.send(result);
     });
     
+
+     // =========================== carts ==============================
+
+    // post method for posts
+    app.post("/carts", async (req, res) => {
+      const carts = req.body;
+      carts.time = new Date();
+      const result = await cartsCollection.insertOne(carts);
+      res.send(result);
+    });
+
+    // get method for posts
+    app.get("/carts", async (req, res) => {
+      const result = await cartsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await cartsCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.delete("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartsCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // =========================== Order PARCEL ===================================
 
