@@ -115,7 +115,7 @@ async function run() {
 
       const options = {
         sort: {
-          time: -1,
+          date: -1,
         },
       };
 
@@ -138,9 +138,11 @@ async function run() {
 
     app.post("/products", async (req, res) => {
       const product = req.body;
+      product.date = new Date();
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
+    
 
     app.put("/products/:id", async (req, res) => {
       const id = req.params.id;
