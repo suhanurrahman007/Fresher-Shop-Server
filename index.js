@@ -142,7 +142,6 @@ async function run() {
       const result = await productsCollection.insertOne(product);
       res.send(result);
     });
-    
 
     app.put("/products/:id", async (req, res) => {
       const id = req.params.id;
@@ -155,15 +154,20 @@ async function run() {
       };
       const updateProduct = {
         $set: {
-          name: product.name,
-          brandName: product.brandName,
-          productType: product.productType,
-          price: product.price,
-          rating: product.rating,
-          productImageURL: product.productImageURL,
-          detailedDescription: product.detailedDescription,
+          product_name: product?.product_name,
+          brand: product?.brand,
+          price: product?.price,
+          discount_price: product?.discount_price,
+          product_type: product?.product_type,
+          description: product?.description,
+          category: product?.category,
+          image: product?.image,
+          status: product?.status,
+          date: new Date(),
         },
       };
+
+      console.log(updateProduct)
 
       const result = await productsCollection.updateOne(
         query,
@@ -175,7 +179,6 @@ async function run() {
 
     app.delete("/products/:id", async (req, res) => {
       const id = req.params.id;
-      // const product = req.body
       const query = {
         _id: new ObjectId(id),
       };
@@ -256,14 +259,14 @@ async function run() {
     app.put("/comments/:id", async (req, res) => {
       const id = req.params.id;
       const { updatedLike } = req.body; // Destructure the correct field from the body
-    
+
       const filter = { _id: new ObjectId(id) };
       const likeUpdate = {
         $set: {
           like: updatedLike, // Correctly use the updated like count
         },
       };
-    
+
       try {
         const result = await commentsCollection.updateOne(filter, likeUpdate);
         res.send(result);
@@ -272,9 +275,8 @@ async function run() {
         res.status(500).send({ error: "Failed to update like" });
       }
     });
-    
-    
-     // =========================== brands ==============================
+
+    // =========================== brands ==============================
 
     // post method for posts
     app.post("/brands", async (req, res) => {
@@ -298,9 +300,8 @@ async function run() {
       const result = await brandsCollection.findOne(query);
       res.send(result);
     });
-    
 
-     // =========================== carts ==============================
+    // =========================== carts ==============================
 
     // post method for posts
     app.post("/carts", async (req, res) => {
