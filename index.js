@@ -167,7 +167,7 @@ async function run() {
         },
       };
 
-      console.log(updateProduct)
+      console.log(updateProduct);
 
       const result = await productsCollection.updateOne(
         query,
@@ -224,6 +224,47 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/posts/:id", async (req, res) => {
+      const id = req.params.id;
+      const post = req.body;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const options = {
+        upsert: true,
+      };
+      const updatePost = {
+        $set: {
+          name: post?.name,
+          userImg: post?.userImg,
+          title: post?.title,
+          description: post?.description,
+          category: post?.category,
+          status: post?.status,
+          image: post?.image,
+          tag: post.tag,
+          date: new Date(),
+        },
+      };
+
+      console.log(updatePost);
+
+      const result = await postsCollection.updateOne(
+        query,
+        updatePost,
+        options
+      );
+      res.send(result);
+    });
+
+    app.delete("/posts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await postsCollection.deleteOne(query);
+      res.send(result);
+    });
     // =========================== Comments ==============================
 
     // post method for posts
