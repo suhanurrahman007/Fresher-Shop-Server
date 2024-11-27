@@ -27,6 +27,7 @@ async function run() {
     const productsCollection = client.db("superShop").collection("products");
     const postsCollection = client.db("superShop").collection("posts");
     const commentsCollection = client.db("superShop").collection("comments");
+    const ratingsCollection = client.db("superShop").collection("ratings");
     const cartsCollection = client.db("superShop").collection("carts");
     const brandsCollection = client.db("superShop").collection("brand");
     const paymentCollection = client.db("superShop").collection("payment");
@@ -310,6 +311,59 @@ async function run() {
 
       try {
         const result = await commentsCollection.updateOne(filter, likeUpdate);
+        res.send(result);
+      } catch (error) {
+        console.error("Error updating like:", error);
+        res.status(500).send({ error: "Failed to update like" });
+      }
+    });
+
+
+    // =========================== ratings ==============================
+
+    // post method for posts
+    app.post("/ratings", async (req, res) => {
+      const ratings = req.body;
+      ratings.time = new Date();
+      const result = await ratingsCollection.insertOne(ratings);
+      res.send(result);
+    });
+
+    // get method for posts
+    app.get("/ratings", async (req, res) => {
+      const result = await ratingsCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/ratings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await ratingsCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.delete("/ratings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await ratingsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.put("/ratings/:id", async (req, res) => {
+      const id = req.params.id;
+      const { updatedLike } = req.body; // Destructure the correct field from the body
+
+      const filter = { _id: new ObjectId(id) };
+      const likeUpdate = {
+        $set: {
+          like: updatedLike, // Correctly use the updated like count
+        },
+      };
+
+      try {
+        const result = await ratingsCollection.updateOne(filter, likeUpdate);
         res.send(result);
       } catch (error) {
         console.error("Error updating like:", error);
