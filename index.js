@@ -86,22 +86,34 @@ async function run() {
 
     app.post("/users", async (req, res) => {
       const user = req.body;
-      console.log(user);
-      // const query = {
-      //   email: user?.email,
-      // };
-      // const existingUser = await usersCollection.findOne(query);
-      // if (existingUser) {
-      //   return res.send({
-      //     message: "user already exist",
-      //     insertedId: null,
-      //   });
-      // }
+      const query = {
+        email: user?.email,
+      };
+      const existingUser = await usersCollection.findOne(query);
+      if (existingUser) {
+        return res.send({
+          message: "user already exist",
+          insertedId: null,
+        });
+      }
       const result = await usersCollection.insertOne(user);
       res.send(result);
     });
 
-    app.delete("/user/:id", async (req, res) => {
+    // patch method for user to make admin
+    app.patch("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
+    app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await usersCollection.deleteOne(query);
