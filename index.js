@@ -472,19 +472,15 @@ async function run() {
     // Order update
     app.put("/order/:id", async (req, res) => {
       const id = req.params.id;
-      const updateOrder = req.body;
-      // console.log(updateOrder);
-
+      const paymentStatus = req.body;
       const filter = { _id: new ObjectId(id) };
-      const orderUpdate = {
+      const payment = {
         $set: {
-          // phone: updateOrder?.phone,
-          // deliveryDate: updateOrder?.time,
-          payment: updateOrder?.payment,
+          payment: paymentStatus?.payment,
         },
       };
 
-      const result = await orderCollection.updateOne(filter, orderUpdate);
+      const result = await orderCollection.updateOne(filter, payment);
       res.send(result);
     });
 
@@ -499,7 +495,6 @@ async function run() {
       const statusUpdate = {
         $set: {
           status: status?.status,
-          payment: status?.payment,
         },
       };
 
