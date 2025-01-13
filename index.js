@@ -330,7 +330,6 @@ async function run() {
       }
     });
 
-
     // =========================== ratings ==============================
 
     // post method for posts
@@ -548,6 +547,13 @@ async function run() {
       res.send(result);
     });
 
+    // Delete payment
+    app.delete("/payment/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await paymentCollection.deleteOne(query);
+      res.send(result);
+    });
     // +++++++++++++++++++++++++++ THE END ++++++++++++++++++++++++++++
 
     // Send a ping to confirm a successful connection
