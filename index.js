@@ -33,6 +33,8 @@ async function run() {
     const paymentCollection = client.db("superShop").collection("payment");
     const orderCollection = client.db("superShop").collection("order");
     const jobCollection = client.db("superShop").collection("job");
+    const returnCollection = client.db("superShop").collection("return");
+
 
     // ============================== ADMIN =================================
 
@@ -563,6 +565,56 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await jobCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // =========================== Return Product ==============================
+
+    // post method for posts
+    app.post("/return", async (req, res) => {
+      const product = req.body;
+      product.time = new Date();
+      const result = await returnCollection.insertOne(product);
+      res.send(result);
+    });
+
+    // get method for posts
+    app.get("/return", async (req, res) => {
+      const result = await returnCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/return/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await returnCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.patch("/return/:id", async (req, res) => {
+      const id = req.params.id;
+      const status = req.body;
+
+      const filter = {
+        _id: new ObjectId(id)
+      };
+
+      const statusUpdate = {
+        $set: {
+          status: status?.status,
+        },
+      };
+
+      const result = await returnCollection.updateOne(filter, statusUpdate)
+      res.send(result)
+    });
+
+    app.delete("/return/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await returnCollection.deleteOne(query);
       res.send(result);
     });
 
