@@ -32,6 +32,8 @@ async function run() {
     const brandsCollection = client.db("superShop").collection("brand");
     const paymentCollection = client.db("superShop").collection("payment");
     const orderCollection = client.db("superShop").collection("order");
+    const jobCollection = client.db("superShop").collection("job");
+
     // ============================== ADMIN =================================
 
     // Admin
@@ -107,6 +109,19 @@ async function run() {
       const updatedDoc = {
         $set: {
           role: "admin",
+        },
+      };
+      const result = await usersCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
+    // patch method for user to make admin
+    app.put("/users/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: "delivery boy",
         },
       };
       const result = await usersCollection.updateOne(filter, updatedDoc);
@@ -506,6 +521,48 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // ========================== job ==============================
+
+    app.post("/job", async (req, res) => {
+      const job = req.body;
+      job.time = new Date();
+      const result = await jobCollection.insertOne(job);
+      res.send(result);
+    });
+
+    app.get("/job", async (req, res) => {
+      const result = await jobCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+      const result = await jobCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.patch("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: "delivery boy",
+        },
+      };
+      const result = await jobCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    });
+
+    app.delete("/job/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await jobCollection.deleteOne(query);
       res.send(result);
     });
 
